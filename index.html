@@ -1,28 +1,132 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
-    <title>Düsseldorf - Die Perle am Rhein</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Düsseldorf – Die Perle am Rhein</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+body{font-family:'DM Sans',sans-serif;margin:0;background:#fafaf7;color:#1a1a1a;}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#1a4a72;color:#fff;text-align:center;}
+.hero h1{font-size:5rem;margin:0;}
+.hero span{color:#C8102E;}
+
+.section{padding:4rem 1.5rem;max-width:1100px;margin:auto;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+
+.card{background:#fff;border-radius:8px;padding:2rem;text-align:center;box-shadow:0 5px 20px rgba(0,0,0,0.08);transition:0.3s;}
+.card:hover{transform:translateY(-8px);}
+
+.emoji{font-size:4rem;margin-bottom:1rem;}
+
+#map{height:500px;border-radius:8px;margin-top:2rem;}
+</style>
 </head>
+
 <body>
-    <h1>Willkommen in Düsseldorf – der schönsten Stadt am Rhein!</h1>
-    <p>Wer Düsseldorf kennt, weiß: Hier ist alles besser als in Köln – vom Altbier bis zur Lebensqualität!</p>
 
-    <h2>Fortuna Düsseldorf (F95)</h2>
-    <p>Unser Verein ist Tradition pur. Mit leidenschaftlichen Fans im Rücken kämpft die Fortuna in der Merkur Spiel-Arena immer für die Farben Rot und Weiß.</p>
-    <img src="fortuna.svg" alt="Fortuna Düsseldorf Logo">
+<section class="hero">
+  <div>
+    <h1>Düssel<span>dorf</span></h1>
+    <p>Die Perle am Rhein</p>
+  </div>
+</section>
 
-    <h2>Unsere Highlights:</h2>
-    <ul>
-        <li><strong>Merkur Spiel-Arena:</strong> Die Heimat unserer Fortuna.</li>
-        <img src="arena.jpg" alt="Merkur Spiel-Arena">
-        <li><strong>Königsallee (Kö):</strong> Exklusive Shopping-Meile.</li>
-        <img src="koe.jpg" alt="Königsallee">
-        <li><strong>Brauerei Schumacher:</strong> Traditionelles Altbier genießen.</li>
-        <img src="schumacher.jpg" alt="Brauerei Schumacher">
-        <li><strong>Rheinwiesen:</strong> Entspannung mit Blick auf die Skyline.</li>
-        <img src="rheinwiesen.jpg" alt="Rheinwiesen">
-    </ul>
+<section class="section">
+<h2>Highlights</h2>
+
+<div class="cards-grid">
+
+<div class="card">
+<div class="emoji">🏟️</div>
+<h3>Merkur Spiel-Arena</h3>
+<p>Heimat von Fortuna Düsseldorf und große Event-Location.</p>
+</div>
+
+<div class="card">
+<div class="emoji">🛍️</div>
+<h3>Königsallee</h3>
+<p>Luxus-Shopping und Flanieren am Wasser.</p>
+</div>
+
+<div class="card">
+<div class="emoji">🍺</div>
+<h3>Altstadt</h3>
+<p>Die „längste Theke der Welt“ mit über 300 Bars.</p>
+</div>
+
+<div class="card">
+<div class="emoji">🌊</div>
+<h3>Rheinpromenade</h3>
+<p>Perfekt zum Spazieren mit Blick auf den Rhein.</p>
+</div>
+
+</div>
+
+<div id="map"></div>
+
+</section>
+
+<script>
+// Map
+const map = L.map('map',{scrollWheelZoom:false}).setView([51.2277,6.7735],13);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap &copy; CARTO',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
+
+// bessere Emoji Marker
+function emojiIcon(emoji, color){
+return L.divIcon({
+className: '',
+html: `
+<div style="
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:#fff;
+  border:3px solid ${color};
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  font-size:22px;
+">
+  ${emoji}
+</div>
+`,
+iconSize:[44,44],
+iconAnchor:[22,22],
+popupAnchor:[0,-20]
+});
+}
+
+// Spots mit Farben
+const spots = [
+["🍺 Altstadt",51.2287,6.7735,"Bars & Nachtleben","#b8860b"],
+["🛍️ Königsallee",51.2219,6.7793,"Shopping","#C8102E"],
+["🏟️ Arena",51.2612,6.7324,"Fortuna Düsseldorf","#1a4a72"],
+["🌿 Rheinwiesen",51.2473,6.7489,"Natur & Entspannung","#2e8b57"],
+["🗼 Rheinturm",51.2160,6.7610,"Aussicht","#555"],
+["🎨 MedienHafen",51.2175,6.7460,"Architektur","#8a2be2"],
+["🎭 Oper",51.2272,6.7716,"Kultur","#ff1493"],
+["🚶 Promenade",51.2260,6.7720,"Spaziergänge","#0088cc"]
+];
+
+// Marker
+spots.forEach(s=>{
+L.marker([s[1],s[2]],{icon:emojiIcon(s[0][0], s[4])})
+.addTo(map)
+.bindPopup(`<b>${s[0]}</b><br>${s[3]}`);
+});
+</script>
+
 </body>
 </html>
